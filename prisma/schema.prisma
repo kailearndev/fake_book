@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "commonjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  password  String // Sẽ dùng Bcrypt để băm mật khẩu
+  name      String?
+  posts     Post[]
+  reactions Reaction[]
+  createdAt DateTime   @default(now())
+  comments  Comment[]
+}
+
+model Comment {
+  id      String @id @default(uuid())
+  content String
+
+  // Liên kết tới bài viết
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  // Liên kết tới người viết
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  // --- MAGIC LÀ Ở ĐÂY: SELF-RELATION ---
+  parentId String? // Nếu có giá trị, đây là một Reply
+  parent   Comment?  @relation("CommentToReply", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  Comment[] @relation("CommentToReply")
+  // -------------------------------------
+
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id        String      @id @default(uuid())
+  content   String
+  authorId  String
+  author    User        @relation(fields: [authorId], references: [id])
+  reactions Reaction[]
+  createdAt DateTime    @default(now())
+  images    PostImage[] // Mảng chứa URL của ảnh, nếu có
+  comments  Comment[]
+}
+
+model PostImage {
+  id        String   @id @default(uuid())
+  url       String
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Reaction {
+  id        String   @id @default(uuid())
+  type      String // Có thể lưu dạng "LIKE", "LOVE", "HAHA", "SAD"
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id])
+  createdAt DateTime @default(now())
+
+  // Ràng buộc cực kỳ quan trọng: 1 User chỉ được thả 1 loại React trên 1 Post
+  @@unique([userId, postId])
+}
