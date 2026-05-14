@@ -8,7 +8,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class PostsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
   async createPost(userId: string, content: string, imageUrls: string[] = []) {
     const post = await this.prismaService.post.create({
       data: {
@@ -39,6 +39,7 @@ export class PostsService {
           select: { type: true, userId: true },
         },
         comments: {
+          orderBy: { createdAt: 'asc' },
           where: { parentId: null }, // Chỉ lấy comment gốc trước
           include: {
             author: { select: { name: true } },
@@ -48,7 +49,9 @@ export class PostsService {
                 author: { select: { name: true } },
               },
             },
+
           },
+
         },
       },
     });
