@@ -227,14 +227,14 @@ GET /auth/profile
 Authorization: Bearer <access_token>
 ```
 
-### Posts
+### Uploads
 
-Tất cả endpoint `/posts` yêu cầu Bearer token.
+Tất cả endpoint `/uploads` yêu cầu Bearer token.
 
-Tạo bài viết kèm ảnh:
+Upload ảnh:
 
 ```http
-POST /posts
+POST /uploads/images
 Authorization: Bearer <access_token>
 Content-Type: multipart/form-data
 ```
@@ -242,9 +242,35 @@ Content-Type: multipart/form-data
 Form data:
 
 ```text
-content=Hôm nay trời đẹp quá!
 images=<file>
 images=<file>
+```
+
+Response:
+
+```json
+{
+  "urls": ["https://s3.cloudfly.vn/bucket/fakebook/image.jpg"]
+}
+```
+
+### Posts
+
+Tất cả endpoint `/posts` yêu cầu Bearer token.
+
+Tạo bài viết:
+
+```http
+POST /posts
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
+```json
+{
+  "content": "Hôm nay trời đẹp quá!",
+  "images": ["https://s3.cloudfly.vn/bucket/fakebook/image.jpg"]
+}
 ```
 
 Lấy danh sách bài viết:

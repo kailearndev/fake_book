@@ -12,14 +12,20 @@ import { ReactionService } from './reaction/reaction.service';
 import { ReactionController } from './reaction/reaction.controller';
 import { CommentService } from './comment/comment.service';
 import { CommentController } from './comment/comment.controller';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({
-    isGlobal: true,
-  }), PrismaModule, AuthModule, PostsModule, JwtModule],
-  controllers: [AppController, ReactionController, CommentController],
-  providers: [AppService, ReactionService, CommentService,
-
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    PrismaModule,
+    AuthModule,
+    PostsModule,
+    JwtModule,
+    UploadModule,
   ],
+  controllers: [AppController, ReactionController, CommentController],
+  providers: [AppService, ReactionService, CommentService],
 })
-export class AppModule { }
+export class AppModule {}
