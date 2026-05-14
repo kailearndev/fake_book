@@ -39,7 +39,7 @@ export class PostsService {
           select: { type: true, userId: true },
         },
         comments: {
-          orderBy: { createdAt: 'asc' },
+          orderBy: { createdAt: "desc" },
           where: { parentId: null }, // Chỉ lấy comment gốc trước
           include: {
             author: { select: { name: true } },
