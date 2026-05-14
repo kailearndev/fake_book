@@ -39,11 +39,12 @@ export class PostsService {
           select: { type: true, userId: true },
         },
         comments: {
-          orderBy: { createdAt: "desc" },
+
           where: { parentId: null }, // Chỉ lấy comment gốc trước
           include: {
             author: { select: { name: true } },
             replies: {
+              orderBy: { createdAt: "desc" },
               // Lấy các reply của comment đó
               include: {
                 author: { select: { name: true } },
