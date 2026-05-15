@@ -3,11 +3,16 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+const seedCommand =
+  process.env.NODE_ENV === "production"
+    ? "node dist/prisma/seed.js"
+    : "ts-node prisma/seed.ts";
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
-    seed: "ts-node prisma/seed.ts",
+    seed: seedCommand,
   },
   datasource: {
     url: process.env["DATABASE_URL"],
