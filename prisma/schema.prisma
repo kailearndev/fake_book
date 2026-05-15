@@ -4,13 +4,27 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider     = "prisma-client"
-  output       = "../generated/prisma"
-  moduleFormat = "commonjs"
+  provider            = "prisma-client"
+  output              = "../generated/prisma"
+  moduleFormat        = "commonjs"
+  importFileExtension = ""
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+  BLOCKED
+}
+
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
 }
 
 model User {
@@ -21,7 +35,10 @@ model User {
   posts     Post[]
   reactions Reaction[]
   createdAt DateTime   @default(now())
-  comments  Comment[]
+  status    UserStatus @default(PENDING)
+
+  comments Comment[]
+  roles    String[]  @default(["USER"]) // Mảng chứa các role của user, ví dụ: ["USER", "ADMIN"]
 }
 
 model Comment {

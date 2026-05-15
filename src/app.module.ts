@@ -13,6 +13,7 @@ import { ReactionController } from './reaction/reaction.controller';
 import { CommentService } from './comment/comment.service';
 import { CommentController } from './comment/comment.controller';
 import { UploadModule } from './upload/upload.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { UploadModule } from './upload/upload.module';
     PostsModule,
     JwtModule,
     UploadModule,
+    UserModule,
   ],
   controllers: [AppController, ReactionController, CommentController],
   providers: [AppService, ReactionService, CommentService],
