@@ -1,6 +1,6 @@
 services:
   api:
-    image: ghcr.io/kai/fake-book-api:latest
+    image: ghcr.io/kailearndev/fake-book-api:latest
 
     container_name: fake_book_api
 
