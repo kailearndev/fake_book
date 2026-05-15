@@ -1,8 +1,9 @@
-name: Deploy API (Traditional Style)
+name: Deploy API (Traditional Build on VPS)
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   deploy:
@@ -15,8 +16,16 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
+            set -e
             cd ~/fake_book/
+
+            # Kéo code mới nhất từ GitHub về VPS
             git pull origin main
-            # VPS tự thân vận động: vừa build vừa chạy
+
+            # Ra lệnh cho Docker Compose build lại image mới từ code vừa kéo
+            # --build: bắt buộc build lại kể cả khi đã có image cũ
+            # -d: chạy ngầm (detached)
             docker compose up -d --build
+
+            # Dọn dẹp các image cũ, thừa thãi để nhẹ máy
             docker image prune -f

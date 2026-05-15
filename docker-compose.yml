@@ -1,17 +1,15 @@
 services:
   api:
-    image: ghcr.io/kailearndev/fake-book-api:latest
-
+    # Docker sẽ build image từ file Dockerfile trong cùng thư mục
+    build: .
+    # Vẫn giữ tên image để Docker quản lý local cho dễ
+    image: fake-book-api:latest
     container_name: fake_book_api
-
     restart: unless-stopped
-
     env_file:
       - .env
-
     ports:
       - '3000:3000'
-
     networks:
       - fake_book_network
 
