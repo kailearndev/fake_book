@@ -1,4 +1,4 @@
-name: Deploy API (Traditional Build on VPS)
+name: Build and Deploy API
 
 on:
   push:
@@ -6,26 +6,56 @@ on:
       - main
 
 jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # Nhớ sửa 'kailearndev' thành username của ông
+          tags: ghcr.io/${{ github.repository_owner }}/fake-book-api:latest
+
   deploy:
     runs-on: ubuntu-latest
+    needs: build-and-push # Chỉ chạy khi build thành công
+
     steps:
-      - name: Deploy via SSH
+      - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          # Truyền token vào môi trường để VPS dùng login
+          envs: GITHUB_TOKEN, GITHUB_ACTOR
           script: |
             set -e
+            # Đăng nhập vào kho GitHub từ VPS
+            echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+
             cd ~/fake_book/
-
-            # Kéo code mới nhất từ GitHub về VPS
-            git pull origin main
-
-            # Ra lệnh cho Docker Compose build lại image mới từ code vừa kéo
-            # --build: bắt buộc build lại kể cả khi đã có image cũ
-            # -d: chạy ngầm (detached)
-            docker compose up -d --build
-
-            # Dọn dẹp các image cũ, thừa thãi để nhẹ máy
+            # Tải image mới từ kho về
+            docker compose pull
+            # Khởi động lại với image mới
+            docker compose up -d
+            # Dọn dẹp image cũ cho sạch máy
             docker image prune -f
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
